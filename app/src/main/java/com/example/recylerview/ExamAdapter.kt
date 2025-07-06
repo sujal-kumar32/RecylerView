@@ -6,24 +6,36 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ExamAdapter(var list :ArrayList<ExamEntity>):RecyclerView.Adapter<ExamAdapter.Viewholder>() {
+class ExamAdapter(var list :ArrayList<ExamEntity>,var clickInterface: ClickOn):RecyclerView.Adapter<ExamAdapter.Viewholder>() {
     class Viewholder (var view: View):RecyclerView.ViewHolder(view){
-        var visay=view.findViewById<TextView>(R.id.edt1)
-        var date=view.findViewById<TextView>(R.id.edt2)
+        var textName=view.findViewById<TextView>(R.id.edt1)
+        var textDate=view.findViewById<TextView>(R.id.edt2)
+        var submit=view.findViewById<TextView>(R.id.btn1)
+        var cancel=view.findViewById<TextView>(R.id.btn2)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExamAdapter.Viewholder {
-        var view = LayoutInflater.from(parent.context).inflate(R.layout.exam_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.exam_item, parent, false)
         return Viewholder(view)
     }
     override fun onBindViewHolder(holder: ExamAdapter.Viewholder, position: Int) {
         holder.apply {
-            visay.setText(list[position].examName)
-            date.setText(list[position].examDate)
+            textName.setText(list[position].examName)
+            textDate.setText(list[position].examDate)
+            submit.setOnClickListener {
+                clickInterface.update(position)
+            }
+            cancel.setOnClickListener {
+                clickInterface.delete(position)
+            }
         }
     }
     override fun getItemCount(): Int {
         return list.size
+    }
+    interface ClickOn{
+        fun update(position: Int)
+        fun delete(position: Int)
     }
 
 }

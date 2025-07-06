@@ -2,49 +2,50 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#00BCD4">
+
 
     <TextView
         android:id="@+id/tv1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Exam Shedule"
+        android:text="Enter Subject Name and Date"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center_horizontal"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="25dp"
-        />
 
-    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center_horizontal"
+        android:background="#3F51B5"
+        android:textColor="#FFFFFF" />
+    <EditText
+        android:id="@+id/et1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/edt1"
-
-        android:textSize="18sp"
+        android:hint="Enter the subject name"
+        android:inputType="text"
         app:layout_constraintTop_toBottomOf="@+id/tv1"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="15dp"
-        />
-    <TextView
+        android:textSize="25sp"
+        android:layout_margin="16dp" />
+    <EditText
+        android:id="@+id/et2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/edt2"
-
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/edt1"
+        android:hint="Enter the date"
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@+id/et1"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="15dp"
-        />
+        android:textSize="25sp"
+        android:layout_margin="16dp" />
 
     <Button
         android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Update"
-        app:layout_constraintTop_toBottomOf="@+id/edt2"
+        android:text="Submit"
+        app:layout_constraintTop_toBottomOf="@+id/et2"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="80dp"
         android:layout_marginTop="24dp"
@@ -57,8 +58,8 @@
         android:id="@+id/btn2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete"
-        app:layout_constraintTop_toBottomOf="@+id/edt2"
+        android:text="Cancel"
+        app:layout_constraintTop_toBottomOf="@+id/et2"
         app:layout_constraintStart_toEndOf="@id/btn1"
         android:layout_marginStart="25dp"
         android:layout_marginTop="24dp"
@@ -67,4 +68,5 @@
         android:textSize="20sp"
 
         />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
