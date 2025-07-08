@@ -13,10 +13,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recylerview.databinding.ActivityMainBinding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 
 class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
     private lateinit var binding: ActivityMainBinding
+
+
     lateinit var ExamAdapter: ExamAdapter
     var Item = arrayListOf<ExamEntity>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +53,10 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
             )
             dialog.show()
 
-            var submit = dialog.findViewById<Button>(R.id.btn1)
-            var cancel = dialog.findViewById<Button>(R.id.btn2)
+            var submitText = dialog.findViewById<Button>(R.id.btnSubmit)
+            var cancelText = dialog.findViewById<Button>(R.id.btnCancel)
 
-            submit.setOnClickListener {
+            submitText.setOnClickListener {
                 var sub = textName.text.toString()
                 var date = textDate.text.toString()
                 Item.add(ExamEntity(examName = sub, examDate = date))
@@ -63,7 +68,7 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
                 ).show()
                 dialog.dismiss()
             }
-            cancel.setOnClickListener {
+            cancelText.setOnClickListener {
 
                 dialog.dismiss()
             }
@@ -72,12 +77,43 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
 
 
 
-        override fun update(position: Int) {
-            Toast.makeText(this, "update", Toast.LENGTH_SHORT).show()
-        }
+    override fun update(position: Int) {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialogue_box)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
 
-        override fun delete(position: Int) {
+        val textName = dialog.findViewById<EditText>(R.id.et1)
+        val textDate = dialog.findViewById<EditText>(R.id.et2)
+        val submitText = dialog.findViewById<Button>(R.id.btnSubmit)
+        val cancelText = dialog.findViewById<Button>(R.id.btnCancel)
+
+
+        textName.setText(Item[position].examName)
+        textDate.setText(Item[position].examDate)
+
+        dialog.show()
+        submitText.setOnClickListener {
+            val newName = textName.text.toString()
+            val newDate = textDate.text.toString()
+
+            Item[position] = ExamEntity(newName, newDate)
+            ExamAdapter.notifyItemChanged(position)
+            dialog.dismiss()
+        }
+        cancelText.setOnClickListener {
+            dialog.dismiss()
+        }
+    }
+
+
+    override fun delete(position: Int) {
             Item.removeAt(position)
+            ExamAdapter.notifyItemRemoved(position)
             Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
         }
+
+
     }

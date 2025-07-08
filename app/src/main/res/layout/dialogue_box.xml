@@ -41,7 +41,7 @@
         android:layout_margin="16dp" />
 
     <Button
-        android:id="@+id/btn1"
+        android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
@@ -55,12 +55,12 @@
 
         />
     <Button
-        android:id="@+id/btn2"
+        android:id="@+id/btnCancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"
         app:layout_constraintTop_toBottomOf="@+id/et2"
-        app:layout_constraintStart_toEndOf="@id/btn1"
+        app:layout_constraintStart_toEndOf="@id/btnSubmit"
         android:layout_marginStart="25dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="#3F51B5"
