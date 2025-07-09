@@ -70,40 +70,45 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
         binding.rv1.adapter = ExamAdapter
         ExamAdapter.notifyDataSetChanged()
         binding.fab1.setOnClickListener {
+           try {
 
-            var dialog = Dialog(this)
-            dialog.setContentView(R.layout.dialogue_box)
-            var textName = dialog.findViewById<EditText>(R.id.et1)
-            var textDate = dialog.findViewById<EditText>(R.id.et2)
 
-            dialog.window?.setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            dialog.show()
+               var dialog = Dialog(this)
+               dialog.setContentView(R.layout.dialogue_box)
+               var textName = dialog.findViewById<EditText>(R.id.et1)
+               var textDate = dialog.findViewById<EditText>(R.id.et2)
 
-            var submitText = dialog.findViewById<Button>(R.id.btnSubmit)
-            var cancelText = dialog.findViewById<Button>(R.id.btnCancel)
+               dialog.window?.setLayout(
+                   ViewGroup.LayoutParams.MATCH_PARENT,
+                   ViewGroup.LayoutParams.MATCH_PARENT
+               )
+               dialog.show()
 
-            submitText.setOnClickListener {
-                val name = textName.text.toString()
-                val date = textDate.text.toString()
-                val newExam = ExamEntity(examName = name, examDate = date)
+               var submitText = dialog.findViewById<Button>(R.id.btnSubmit)
+               var cancelText = dialog.findViewById<Button>(R.id.btnCancel)
 
-                db.collection("exams").add(newExam)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Exam Added", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Add Failed", Toast.LENGTH_SHORT).show()
-                    }
-                dialog.dismiss()
-            }
+               submitText.setOnClickListener {
+                   val name = textName.text.toString()
+                   val date = textDate.text.toString()
+                   val newExam = ExamEntity(examName = name, examDate = date)
 
-            cancelText.setOnClickListener {
+                   db.collection("exams").add(newExam)
+                       .addOnSuccessListener {
+                           Toast.makeText(this, "Exam Added", Toast.LENGTH_SHORT).show()
+                       }
+                       .addOnFailureListener {
+                           Toast.makeText(this, "Add Failed", Toast.LENGTH_SHORT).show()
+                       }
+                   dialog.dismiss()
+               }
 
-                dialog.dismiss()
-            }
+               cancelText.setOnClickListener {
+
+                   dialog.dismiss()
+               }
+           }catch (e:Exception){
+               Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
+           }
         }
     }
 
