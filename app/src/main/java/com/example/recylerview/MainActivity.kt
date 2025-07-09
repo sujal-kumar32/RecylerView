@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recylerview.databinding.ActivityMainBinding
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
@@ -21,9 +22,10 @@ import com.google.firebase.firestore.firestore
 class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
     private lateinit var binding: ActivityMainBinding
 
-
     lateinit var ExamAdapter: ExamAdapter
     var Item = arrayListOf<ExamEntity>()
+    val db = Firebase.firestore
+    var collectionName = db.collection("exams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,14 +36,41 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        Item.add(ExamEntity(examName = "Maths", examDate = "20/08/2023"))
-        Item.add(ExamEntity(examName = "Maths", examDate = "20/08/2023"))
+
+        collectionName.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                Toast.makeText(this, "Firestore Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                return@addSnapshotListener
+            }
+
+            for (dc in snapshots!!.documentChanges) {
+                val exam = dc.document.toObject(ExamEntity::class.java)
+                exam.id = dc.document.id
+
+                when (dc.type) {
+                    DocumentChange.Type.ADDED -> {
+                        Item.add(exam)
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        val index = getIndex(exam)
+                        if (index > -1) Item[index] = exam
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        val index = getIndex(exam)
+                        if (index > -1) Item.removeAt(index)
+                    }
+                }
+            }
+            ExamAdapter.notifyDataSetChanged()
+        }
+
 
         ExamAdapter = ExamAdapter(Item, this)
         binding.rv1.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.rv1.adapter = ExamAdapter
         ExamAdapter.notifyDataSetChanged()
         binding.fab1.setOnClickListener {
+
             var dialog = Dialog(this)
             dialog.setContentView(R.layout.dialogue_box)
             var textName = dialog.findViewById<EditText>(R.id.et1)
@@ -57,17 +86,20 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
             var cancelText = dialog.findViewById<Button>(R.id.btnCancel)
 
             submitText.setOnClickListener {
-                var sub = textName.text.toString()
-                var date = textDate.text.toString()
-                Item.add(ExamEntity(examName = sub, examDate = date))
-                ExamAdapter.notifyDataSetChanged()
-                Toast.makeText(
-                    this@MainActivity,
-                    "${textName.text}${textDate.text}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val name = textName.text.toString()
+                val date = textDate.text.toString()
+                val newExam = ExamEntity(examName = name, examDate = date)
+
+                db.collection("exams").add(newExam)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Exam Added", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Add Failed", Toast.LENGTH_SHORT).show()
+                    }
                 dialog.dismiss()
             }
+
             cancelText.setOnClickListener {
 
                 dialog.dismiss()
@@ -90,30 +122,54 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
         val submitText = dialog.findViewById<Button>(R.id.btnSubmit)
         val cancelText = dialog.findViewById<Button>(R.id.btnCancel)
 
-
-        textName.setText(Item[position].examName)
-        textDate.setText(Item[position].examDate)
+        val exam = Item[position]
+        textName.setText(exam.examName)
+        textDate.setText(exam.examDate)
 
         dialog.show()
+
         submitText.setOnClickListener {
             val newName = textName.text.toString()
             val newDate = textDate.text.toString()
 
-            Item[position] = ExamEntity(newName, newDate)
-            ExamAdapter.notifyItemChanged(position)
+            val updatedExam = ExamEntity(newName, newDate)
+
+            exam.id?.let {
+                db.collection("exams").document(it)
+                    .set(updatedExam)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Update failed", Toast.LENGTH_SHORT).show()
+                    }
+            }
             dialog.dismiss()
         }
-        cancelText.setOnClickListener {
-            dialog.dismiss()
-        }
+
+        cancelText.setOnClickListener { dialog.dismiss() }
     }
+
 
 
     override fun delete(position: Int) {
-            Item.removeAt(position)
-            ExamAdapter.notifyItemRemoved(position)
-            Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
+        Item[position].id?.let {
+            db.collection("exams").document(it)
+                .delete()
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Delete failed", Toast.LENGTH_SHORT).show()
+                }
         }
-
-
     }
+
+
+    fun getIndex(exam: ExamEntity): Int {
+        return Item.indexOfFirst { it.id == exam.id }
+    }
+
+
+
+}
