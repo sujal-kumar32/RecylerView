@@ -8,6 +8,7 @@ import android.widget.EditText
 
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -158,16 +159,32 @@ class MainActivity : AppCompatActivity(), ExamAdapter.ClickOn {
 
 
     override fun delete(position: Int) {
-        Item[position].id?.let {
-            db.collection("exams").document(it)
-                .delete()
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
+        AlertDialog.Builder(this).apply{
+            setTitle("Delete Exam")
+            setMessage("Are you sure you want to delete this exam?")
+            setPositiveButton("Yes") { _, _ ->
+                Item[position].id?.let {
+                    db.collection("exams").document(it)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(this@MainActivity, "Deleted", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this@MainActivity, "Delete failed", Toast.LENGTH_SHORT).show()
+                        }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Delete failed", Toast.LENGTH_SHORT).show()
-                }
+            }
+            setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            setNeutralButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            setCancelable(true)
+            show()
         }
+
+
     }
 
 
